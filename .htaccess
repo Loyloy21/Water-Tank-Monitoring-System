@@ -1,0 +1,24 @@
+RewriteEngine On
+RewriteBase /WatertankMonitoringSystem/
+
+# Clean Web Navigation Routes
+RewriteRule ^dashboard/?$ dashboard.php [QSA,L]
+RewriteRule ^login/?$ login.php [QSA,L]
+RewriteRule ^logout/?$ logout.php [QSA,L]
+RewriteRule ^landing/?$ landing.php [QSA,L]
+
+# API Endpoints Routing
+RewriteRule ^api/logs/?$ api/logs.php [QSA,L]
+RewriteRule ^api/readings/latest/?$ api/latest.php [QSA,L]
+RewriteRule ^api/readings/history/?$ api/history.php [QSA,L]
+RewriteRule ^api/readings/?$ api/readings.php [QSA,L]
+RewriteRule ^api/alerts/?$ api/alerts.php [QSA,L]
+RewriteRule ^api/device/status/?$ api/device.php [QSA,L]
+RewriteRule ^api/settings/?$ api/settings.php [QSA,L]
+RewriteRule ^api/stream/?$ api/stream.php [QSA,L]
+RewriteRule ^api/simulate/?$ api/simulate.php [QSA,L]
+
+# Serve actual existing files or directories directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]

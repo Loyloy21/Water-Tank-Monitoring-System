@@ -1,0 +1,74 @@
+================================================================================
+ESP32 SMART WATER TANK MONITOR - HARDWARE WIRING & PINOUT SCHEMATIC
+================================================================================
+Sensor: Analog Water Level Sensor (Submerged / Probe / Depth Sensor)
+
+1. COMPONENT PIN CONNECTION MATRIX
+--------------------------------------------------------------------------------
+Component            Pin Name       ESP32 Pin      Notes / Resistor Requirements
+--------------------------------------------------------------------------------
+Water Level Sensor   VCC (+)        3.3V or VIN    Power supply (3.3V recommended)
+Water Level Sensor   GND (-)        GND            Common Ground
+Water Level Sensor   SIGNAL (AOUT)  GPIO 34        ESP32 ADC1 Pin (Analog Input)
+
+Green LED            Anode (+)      GPIO 25        Through 220Ω - 330Ω resistor
+                     Cathode (-)    GND            Common Ground
+
+Yellow LED           Anode (+)      GPIO 26        Through 220Ω - 330Ω resistor
+                     Cathode (-)    GND            Common Ground
+
+Red LED              Anode (+)      GPIO 27        Through 220Ω - 330Ω resistor
+                     Cathode (-)    GND            Common Ground
+
+Active Buzzer        Positive (+)   GPIO 14        Audible critical alert (<= 15%)
+                     Negative (-)   GND            Common Ground
+
+
+--------------------------------------------------------------------------------
+2. ANALOG WATER LEVEL SENSOR CALIBRATION DETAILS
+--------------------------------------------------------------------------------
+The water level sensor outputs a variable analog voltage proportional to the
+depth of water contacting the sensor traces or probe plates.
+
+ESP32 12-bit ADC converts this into a raw value between 0 and 4095:
+- DRY SENSOR (0% Water Level)     : ~500 ADC (SENSOR_MIN_RAW)
+- MAX SUBMERGED (100% Water Level): ~2800 ADC (SENSOR_MAX_RAW)
+
+Conversion Formula:
+waterLevelPct = ((rawADC - SENSOR_MIN_RAW) / (SENSOR_MAX_RAW - SENSOR_MIN_RAW)) * 100
+
+
+--------------------------------------------------------------------------------
+3. COMPLETE SYSTEM BREADBOARD / WIRING OVERVIEW
+--------------------------------------------------------------------------------
+
+             ┌────────────────────────────────────────────────────────┐
+             │                     ESP32 DEVKIT                       │
+             │                                                        │
+             │   3.3V      ───────> Water Level Sensor VCC            │
+             │   GND       ───────> All GNDs (Sensor, LEDs, Buzzer)   │
+             │   GPIO 34   <─────── Water Level Sensor SIGNAL (AOUT)  │
+             │   GPIO 25   ───────> [220Ω] ──> (Green LED) ──> GND    │
+             │   GPIO 26   ───────> [220Ω] ──> (Yellow LED) ──> GND   │
+             │   GPIO 27   ───────> [220Ω] ──> (Red LED) ──> GND      │
+             │   GPIO 14   ───────> (Buzzer +) ───────> Buzzer - GND  │
+             └────────────────────────────────────────────────────────┘
+
+================================================================================
+4. SYSTEM ARCHITECTURE & DATA FLOW
+================================================================================
+
+Water Level Sensor
+        ↓ (Analog Voltage)
+      ESP32 (GPIO 34 ADC)
+        ↓
+   ┌────┴───────────────┐
+   ↓        ↓           ↓
+ LEDs    Buzzer      Wi-Fi / REST API
+                       ↓
+                    Backend
+                       ↓
+                    Database
+                       ↓
+                  Dashboard
+================================================================================
